@@ -29,9 +29,10 @@ The Kobra S1 uses **uClibc** (embedded C library) instead of glibc. Janus WebRTC
 
 **Impact:** Obico falls back to **MJPEG streaming**, which still provides a camera feed but with slightly higher latency than WebRTC. AI failure detection and all other features work normally.
 
-## Installation
+## Tested Printers
+- Anycubic Kobra S1 Combo
 
-> **⚠️ Important:** First-time installation takes **up to 5 minutes** to install Python dependencies.
+## Installation
 
 ### Via SWU Package (Recommended)
 
@@ -60,24 +61,11 @@ touch /useremain/home/rinkhals/apps/obico.enabled
 
 1. After installation completes, restart the printer
 2. Open Rinkhals settings → Apps → Obico → Settings
-3. A **Link QR code** will appear automatically (if printer is unlinked)
-4. Scan the QR code with your phone
+3. A **Link code** will appear automatically (if printer is unlinked)
+4. Scan the Link code with your phone
 5. Complete linking in the Obico app
 
-**To relink:** Set **"Relink"** to "Yes" → restart printer → new QR code appears.
-
-### Via HTTP API
-
-```bash
-# Check status
-curl http://PRINTER_IP:7136/status
-
-# Link printer
-curl -X POST http://PRINTER_IP:7136/link
-
-# Use returned link_code at https://app.obico.io
-```
-
+**To relink:** Set **"Relink"** to "Yes" → restart printer → new Link code appears.
 ### Via SSH
 
 ```bash
@@ -105,7 +93,7 @@ ssh root@PRINTER_IP
 1. Go to Apps → Obico → Settings
 2. Set **"Relink"** to "Yes"
 3. Restart printer
-4. New QR code will appear
+4. New Link code will appear
 
 ### Via HTTP API or SSH
 ```bash
@@ -135,21 +123,6 @@ SET_GCODE_VARIABLE MACRO=_OBICO_LAYER_CHANGE VARIABLE=current_layer VALUE={layer
 Config file: `/useremain/home/rinkhals/printer_data/config/moonraker-obico.cfg`
 
 ## Troubleshooting
-
-### App shows "stopped" or lock icon won't disappear
-First-time installation takes 2-5 minutes. Check install progress:
-```bash
-tail -f /useremain/home/rinkhals/printer_data/logs/obico-install.log
-```
-If still failing after 5 minutes, run manually:
-```bash
-/useremain/home/rinkhals/apps/obico/install.sh
-```
-
-### Check Status
-```bash
-/useremain/home/rinkhals/apps/obico/app.sh status
-```
 
 ### View Logs
 ```bash
