@@ -3,7 +3,6 @@
     "name": "Obico",
     "description": "AI-Powered Failure Detection and Remote Monitoring for Klipper",
     "version": "fae2c90",
-    "url": "https://github.com/TheSpaghettiDetective/moonraker-obico",
     "requirements": {
         "cpu": 10,
         "memory": 50
