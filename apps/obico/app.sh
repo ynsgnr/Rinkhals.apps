@@ -29,16 +29,18 @@ check_installation() {
 }
 
 wait_for_moonraker() {
-    i=0; while [ $i -lt 20 ]; do
+    # Quick check - don't block boot for too long
+    i=0; while [ $i -lt 5 ]; do
         curl -sf http://127.0.0.1:7125/printer/info >/dev/null 2>&1 && return 0
-        sleep 3; i=$((i+1))
+        sleep 2; i=$((i+1))
     done
     return 1
 }
 
 activate_venv() {
     cd "$APP_ROOT"
-    python -m venv --without-pip .
+    # Only create venv if it doesn't exist (creating is slow)
+    [ ! -d "$APP_ROOT/bin" ] && python -m venv --without-pip .
     . bin/activate
     export PYTHONPATH="$APP_ROOT/lib/python3.11/site-packages:$OBICO_DIR:$PYTHONPATH"
 }
@@ -53,22 +55,39 @@ status() {
 }
 
 start() {
+    log "Obico start() called"
+
     check_installation || return 1
     stop
     sync_config
 
-    log "Waiting for Moonraker..."
-    wait_for_moonraker || log "WARNING: Moonraker not ready, starting anyway"
+    log "Checking Moonraker..."
+    if wait_for_moonraker; then
+        log "Moonraker ready"
+    else
+        log "Moonraker not ready yet, starting anyway (Obico will retry)"
+    fi
 
-    log "Starting Obico..."
+    log "Activating venv..."
     activate_venv
 
+    log "Starting moonraker_obico.app..."
     python -m moonraker_obico.app -c "$OBICO_CFG" >> "$OBICO_LOG" 2>&1 &
-    python "$APP_ROOT/obico_api.py" >> "$API_LOG" 2>&1 &
+    OBICO_PID=$!
+    log "moonraker_obico.app PID: $OBICO_PID"
 
-    sleep 2
-    PIDS=$(get_by_name moonraker_obico)
-    [ -n "$PIDS" ] && log "Obico started (PID: $PIDS)" || log "WARNING: Check $OBICO_LOG"
+    log "Starting obico_api.py..."
+    python "$APP_ROOT/obico_api.py" >> "$API_LOG" 2>&1 &
+    API_PID=$!
+    log "obico_api.py PID: $API_PID"
+
+    # Quick check that processes started
+    sleep 1
+    if kill -0 $OBICO_PID 2>/dev/null; then
+        log "Obico started successfully"
+    else
+        log "WARNING: Obico may have failed, check $OBICO_LOG"
+    fi
 }
 
 stop() {
