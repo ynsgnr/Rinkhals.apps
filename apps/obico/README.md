@@ -7,7 +7,6 @@
 - **AI Failure Detection**: Automatically detects print failures
 - **Remote Monitoring**: Monitor prints via web/mobile app
 - **HD Webcam Streaming**: Up to 25 FPS
-- **HTTP API**: Port 7136 for link/status operations
 - **Layer Tracking**: Via Klipper macros
 
 ## Compatibility
@@ -17,7 +16,6 @@
 | AI failure detection | ✅ Works | Uses webcam |
 | Remote monitoring | ✅ Works | Via Obico tunnel |
 | Print status tracking | ✅ Works | Via Moonraker API |
-| HTTP API | ✅ Works | Port 7136 |
 | Layer tracking | ✅ Works | Patched for GoKlipper |
 | MJPEG streaming | ✅ Works | Standard webcam feed |
 | WebRTC streaming | ❌ N/A | Janus not compatible (see below) |
@@ -50,7 +48,7 @@ ssh root@PRINTER_IP  # password: rockchip
 cd /useremain/home/rinkhals/apps
 # Copy obico folder here
 cd obico
-./install.sh     # Install dependencies (takes 2-5 minutes)
+./install.sh
 touch /useremain/home/rinkhals/apps/obico.enabled
 # Restart printer
 ```
@@ -66,25 +64,12 @@ touch /useremain/home/rinkhals/apps/obico.enabled
 5. Complete linking in the Obico app
 
 **To relink:** Set **"Relink"** to "Yes" → restart printer → new Link code appears.
+
 ### Via SSH
 
 ```bash
 ssh root@PRINTER_IP
 /useremain/home/rinkhals/apps/obico/link.sh
-```
-
-## HTTP API (Port 7136)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/status` | Link status (`is_linked`, `server_url`) |
-| GET | `/health` | Health check |
-| POST | `/link` | Start linking |
-| POST | `/relink` | Remove token and re-link |
-
-**Example Response:**
-```json
-{"is_linked": true, "server_url": "https://app.obico.io"}
 ```
 
 ## Re-linking
@@ -95,12 +80,8 @@ ssh root@PRINTER_IP
 3. Restart printer
 4. New Link code will appear
 
-### Via HTTP API or SSH
+### Via SSH
 ```bash
-# Via API
-curl -X POST http://PRINTER_IP:7136/relink
-
-# Via SSH
 /useremain/home/rinkhals/apps/obico/link.sh --relink
 ```
 
@@ -127,7 +108,7 @@ Config file: `/useremain/home/rinkhals/printer_data/config/moonraker-obico.cfg`
 ### View Logs
 ```bash
 tail -f /useremain/home/rinkhals/printer_data/logs/moonraker-obico.log
-tail -f /useremain/home/rinkhals/printer_data/logs/obico-api.log
+tail -f /useremain/home/rinkhals/printer_data/logs/obico-app.log
 ```
 
 ### Verify Moonraker

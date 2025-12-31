@@ -28,9 +28,8 @@ start() {
 stop() {
     kill_by_name obico-start.sh 2>/dev/null || true
     kill_by_name moonraker_obico 2>/dev/null || true
-    kill_by_name obico_api 2>/dev/null || true
-    pkill -f "obico_api.py" 2>/dev/null || true
     pkill -f "moonraker_obico.app" 2>/dev/null || true
+    pkill -f "obico_initializer.py" 2>/dev/null || true
 }
 
 debug() {
